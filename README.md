@@ -8,7 +8,8 @@
 
 **Code de base** : `optimMouvementSIMD.c`
 **Pour changer le code** (par exemple : utiliser le code sans optimisation) :
-⇒ Copier-coller le code souhaité du dossier `alt-code` dans le dossier principal et enlevez le fichier précédent de ce dossier.**
+⇒ Copier-coller le code souhaité du dossier `alt-code` dans le dossier principal et enlevez le fichier précédent de ce dossier.
+
 **Pour changer le flag de compilation :**
 ⇒ Ouvrir `Makefile` et changer le paramètre `-Ox` en remplacant *x* par le niveau d'optimisation souhaité
 
