@@ -5,6 +5,7 @@
 
 ### Généralités
 **Telecharger le fichier `car3.zip` (en bas de la page) et le decompresser dans votre dossier principal. De même pour les librairies `MIPP` et `nrc2` sont en bas du README**
+
 **Code de base** : `optimMouvementSIMD.c`
 **Pour changer le code** (par exemple : utiliser le code sans optimisation) :
 ⇒ Copier-coller le code souhaité du dossier `alt-code` dans le dossier principal et enlevez le fichier précédent de ce dossier.**
