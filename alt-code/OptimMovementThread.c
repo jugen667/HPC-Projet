@@ -8,7 +8,7 @@
 #include <time.h>
 #include <pthread.h>
 
-#define NBR_THREADS 10
+#define NBR_THREADS 2
 #define N 		2
 #define V_MIN 	1
 #define V_MAX 	254
@@ -180,31 +180,66 @@ int main(){
 	uint8** Morphed_Array = ui8matrix((long)*nrl, (long)*nrh, (long)*ncl, (long)*nch);
 
 	// Variables des threads
-	pthread_t pid1;
-	pthread_t pid2;
-	pthread_t pid3;
-	pthread_t pid4;
+	pthread_t pid[NBR_THREADS];
+	// pthread_t pid2;
+	// pthread_t pid3;
+	// pthread_t pid4;
 	thread_args thread_argument[NBR_THREADS];
-	thread_argument->nrh = *nrh;
-	thread_argument->nch = *nch;
+	
 
 	start = clock();
 	for(short m = 1; m < 200; m++){ // 200 images
-		thread_argument->matrice_image = matrice;
-		thread_argument->matrice_moyenne = M_Array;
-		thread_argument->matrice_sortie = Output_Array;
-		thread_argument->matrice_V = V_Array;
+		
+		
 		thread_argument->matrice_E = E_Array;
 
-		pthread_create(&pid1, NULL, mean_matrix_update, &thread_argument);
-		pthread_create(&pid2, NULL, difference_computation, &thread_argument);
-		pthread_create(&pid3, NULL, clamping, &thread_argument);
-		pthread_create(&pid4, NULL, E_estimation, &thread_argument);
+		for(short x = 0; x < NBR_THREADS; x++){
+			thread_argument[x].nrh = *nrh;
+			thread_argument[x].nch = *nch;
+			thread_argument[x].matrice_image = matrice;
+			thread_argument[x].matrice_moyenne = M_Array;
+			pthread_create(&pid[x], NULL, mean_matrix_update, &thread_argument[x]);
+		}
+		for(short x = 0; x < NBR_THREADS; x++){
+			pthread_join(pid[x], NULL);
+		}
 
-		pthread_join(pid1, NULL);
-		pthread_join(pid2, NULL);
-		pthread_join(pid3, NULL);
-		pthread_join(pid4, NULL);
+		for(short x = 0; x < NBR_THREADS; x++){
+			thread_argument[x].nrh = *nrh;
+			thread_argument[x].nch = *nch;
+			thread_argument[x].matrice_image = matrice;
+			thread_argument[x].matrice_moyenne = M_Array;
+			thread_argument[x].matrice_sortie = Output_Array;
+
+			pthread_create(&pid[x], NULL, difference_computation, &thread_argument[x]);
+		}
+		for(short x = 0; x < NBR_THREADS; x++){
+			pthread_join(pid[x], NULL);
+		}
+
+		for(short x = 0; x < NBR_THREADS; x++){
+			thread_argument[x].nrh = *nrh;
+			thread_argument[x].nch = *nch;
+			thread_argument[x].matrice_V = V_Array;
+			thread_argument[x].matrice_sortie = Output_Array;
+
+			pthread_create(&pid[x], NULL, clamping, &thread_argument[x]);
+		}
+		for(short x = 0; x < NBR_THREADS; x++){
+			pthread_join(pid[x], NULL);
+		}
+
+		for(short x = 0; x < NBR_THREADS; x++){
+			thread_argument[x].nrh = *nrh;
+			thread_argument[x].nch = *nch;
+			thread_argument[x].matrice_V = V_Array;
+			thread_argument[x].matrice_E = E_Array;
+
+			pthread_create(&pid[x], NULL, E_estimation, &thread_argument[x]);
+		}
+		for(short x = 0; x < NBR_THREADS; x++){
+			pthread_join(pid[x], NULL);
+		}
 
 		// Erosion 1
 		erosion(E_Array, Morphed_Array, Morphed_Array, nrh, nch);
